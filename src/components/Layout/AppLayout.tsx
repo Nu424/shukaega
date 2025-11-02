@@ -1,14 +1,48 @@
-import { useState } from 'react'
-import { Link, Outlet } from 'react-router-dom'
+import { useEffect, useRef, useState } from 'react'
+import { Link, Outlet, useLocation, useNavigate } from 'react-router-dom'
 import Sidebar from '../Sidebar'
-import ApiKeyModal from '../Modals/ApiKeyModal'
-
-const streak = 3
-const todaysCount = 2
 
 export default function AppLayout() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false)
-  const [isApiKeyModalOpen, setIsApiKeyModalOpen] = useState(false)
+  const [settingsNotice, setSettingsNotice] = useState<string | null>(null)
+  const noticeTimeoutRef = useRef<number | null>(null)
+  const navigate = useNavigate()
+  const location = useLocation()
+
+  useEffect(() => {
+    const clearNotice = () => {
+      if (noticeTimeoutRef.current != null) {
+        window.clearTimeout(noticeTimeoutRef.current)
+        noticeTimeoutRef.current = null
+      }
+    }
+
+    const redirectToSettings = (message?: string) => {
+      clearNotice()
+      setSettingsNotice(message ?? 'OpenRouter APIキーを設定してください。')
+      if (location.pathname !== '/settings') {
+        navigate('/settings')
+      }
+      noticeTimeoutRef.current = window.setTimeout(() => setSettingsNotice(null), 4000)
+    }
+
+    const handleNavSettings = (event: Event) => {
+      const detail = (event as CustomEvent<{ message?: string }>).detail
+      redirectToSettings(detail?.message)
+    }
+
+    const handleLegacyModal = () => {
+      redirectToSettings()
+    }
+
+    window.addEventListener('nav-settings', handleNavSettings as EventListener)
+    window.addEventListener('open-apikey-modal', handleLegacyModal)
+    return () => {
+      window.removeEventListener('nav-settings', handleNavSettings as EventListener)
+      window.removeEventListener('open-apikey-modal', handleLegacyModal)
+      clearNotice()
+    }
+  }, [location.pathname, navigate])
 
   return (
     <div className="flex min-h-screen flex-col bg-slate-50 text-slate-900">
@@ -30,30 +64,25 @@ export default function AppLayout() {
           </div>
         </div>
         <div className="flex items-center gap-4">
-          <div className="flex items-center gap-1 rounded-full bg-indigo-50 px-3 py-1 text-sm font-medium text-indigo-600">
-            <span role="img" aria-label="streak">
-              🔥
-            </span>
-            {streak} day streak
-          </div>
-          <div className="rounded-full bg-emerald-50 px-3 py-1 text-sm text-emerald-600">
-            Today: {todaysCount}/5
-          </div>
-          <button
-            type="button"
-            onClick={() => setIsApiKeyModalOpen(true)}
+          <Link
+            to="/settings"
             className="inline-flex items-center gap-2 rounded-full border border-slate-200 px-4 py-2 text-sm font-medium text-slate-600 transition hover:border-indigo-200 hover:text-indigo-600"
           >
             <span aria-hidden>⚙️</span>
             Settings
-          </button>
+          </Link>
         </div>
       </header>
 
       <div className="flex flex-1 overflow-hidden">
         <Sidebar isOpen={isSidebarOpen} onClose={() => setIsSidebarOpen(false)} />
-        <main className="flex-1 overflow-y-auto bg-slate-50 p-6 lg:ml-72">
-          <div className="mx-auto flex max-w-5xl flex-col gap-6">
+        <main className="flex-1 overflow-y-auto bg-slate-50 p-6">
+          <div className="flex flex-col gap-6">
+            {settingsNotice && (
+              <div className="rounded-2xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-700">
+                {settingsNotice}
+              </div>
+            )}
             <Outlet />
           </div>
         </main>
@@ -72,7 +101,6 @@ export default function AppLayout() {
         </div>
       </footer>
 
-      <ApiKeyModal open={isApiKeyModalOpen} onClose={() => setIsApiKeyModalOpen(false)} />
     </div>
   )
 }
