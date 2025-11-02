@@ -3,10 +3,10 @@ type PromptCardProps = {
   theme: string
   level: string
   source: 'local' | 'llm'
-  onRetrySimilar?: () => void
+  onNext?: () => void
 }
 
-export default function PromptCard({ japanese, theme, level, source, onRetrySimilar }: PromptCardProps) {
+export default function PromptCard({ japanese, theme, level, source, onNext }: PromptCardProps) {
   return (
     <section className="rounded-3xl bg-white p-6 shadow-md transition hover:shadow-lg">
       <div className="flex items-center justify-between text-xs uppercase tracking-wide text-slate-400">
@@ -15,16 +15,17 @@ export default function PromptCard({ japanese, theme, level, source, onRetrySimi
         <span className="text-slate-400">{source === 'local' ? 'ローカルお題' : 'LLM生成'}</span>
       </div>
       <p className="mt-4 text-2xl font-semibold leading-relaxed text-slate-800">{japanese}</p>
-      <div className="mt-6 flex items-center justify-between text-sm text-indigo-600">
-        <button
-          type="button"
-          onClick={onRetrySimilar}
-          className="rounded-full border border-indigo-100 px-4 py-2 font-medium transition hover:bg-indigo-50"
-        >
-          似たお題をもう1問
-        </button>
-        <span className="text-xs text-slate-400">1/20</span>
-      </div>
+      {onNext && (
+        <div className="mt-6 flex justify-end">
+          <button
+            type="button"
+            onClick={onNext}
+            className="rounded-full border border-indigo-100 px-5 py-2 text-sm font-medium text-indigo-600 transition hover:bg-indigo-50"
+          >
+            次のお題へ
+          </button>
+        </div>
+      )}
     </section>
   )
 }

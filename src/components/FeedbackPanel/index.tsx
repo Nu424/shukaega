@@ -7,6 +7,8 @@ type FeedbackPanelProps = {
   grammarPoint?: string
   encouragement?: string
   variations?: string[]
+  onAddToReview?: () => void
+  onNext?: () => void
 }
 
 const statusStyles: Record<FeedbackStatus, string> = {
@@ -23,6 +25,8 @@ export default function FeedbackPanel({
   grammarPoint,
   encouragement,
   variations = [],
+  onAddToReview,
+  onNext,
 }: FeedbackPanelProps) {
   const containerClass = `rounded-3xl border p-6 shadow-inner transition ${statusStyles[status]}`
 
@@ -65,12 +69,26 @@ export default function FeedbackPanel({
               </ul>
             </div>
           )}
-          <button
-            type="button"
-            className="rounded-full border border-current px-4 py-2 text-xs font-semibold transition hover:bg-white/30"
-          >
-            🔊 英語で聞いてみる
-          </button>
+          <div className="mt-4 flex flex-wrap gap-3">
+            {onAddToReview && (
+              <button
+                type="button"
+                onClick={onAddToReview}
+                className="rounded-full border border-current px-4 py-2 text-sm font-medium transition hover:bg-white/30"
+              >
+                復習リストに追加する
+              </button>
+            )}
+            {onNext && (
+              <button
+                type="button"
+                onClick={onNext}
+                className="rounded-full border border-current px-4 py-2 text-sm font-medium transition hover:bg-white/30"
+              >
+                次のお題へ
+              </button>
+            )}
+          </div>
         </div>
       )}
     </section>

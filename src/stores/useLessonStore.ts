@@ -41,7 +41,6 @@ type LessonStoreState = {
   generatePrompt: (theme?: string | null, options?: { force?: boolean }) => Promise<LessonPrompt | null>
   evaluateAnswer: () => Promise<LessonFeedback | null>
   next: (theme?: string | null) => Promise<LessonPrompt | null>
-  retrySimilar: () => Promise<LessonPrompt | null>
 }
 
 const isBrowser = typeof window !== 'undefined'
@@ -295,10 +294,6 @@ export const useLessonStore = create<LessonStoreState>()(
           set({ userAnswer: '', feedback: null, error: null, lastResult: snapshot })
 
           return get().generatePrompt(theme ?? get().selectedTheme ?? null)
-        },
-        async retrySimilar() {
-          const theme = get().currentPrompt?.theme ?? get().selectedTheme ?? null
-          return get().generatePrompt(theme, { force: true })
         },
       }
     },

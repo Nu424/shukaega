@@ -28,8 +28,8 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
       <aside className={containerClasses}>
         <div className="mb-8 flex items-center justify-between">
           <div>
-            <p className="text-lg font-semibold text-slate-800">Learning Themes</p>
-            <p className="text-xs text-slate-400">旅・日常・ビジネスなどを選択</p>
+            <p className="text-lg font-semibold text-slate-800">学習メニュー</p>
+            <p className="text-xs text-slate-400">トレーニングや復習、設定を行えます</p>
           </div>
           <button
             type="button"

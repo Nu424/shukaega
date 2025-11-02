@@ -24,14 +24,12 @@ export default function Home() {
     initializeQueue,
     evaluateAnswer,
     next,
-    retrySimilar,
   } = useLessonStore()
   const addHistoryItem = useHistoryStore((state) => state.add)
   const markHistoryForReview = useHistoryStore((state) => state.addToReview)
   const historyItems = useHistoryStore((state) => state.items)
   const [isInitialised, setIsInitialised] = useState(false)
   const [customTheme, setCustomTheme] = useState('')
-  const [reviewNotice, setReviewNotice] = useState('')
 
   useEffect(() => {
     if (!currentPrompt && !isGeneratingPrompt && !isInitialised) {
@@ -56,10 +54,6 @@ export default function Home() {
     }
 
     await next(selectedTheme ?? null)
-  }
-
-  const handleRetrySimilar = async () => {
-    await retrySimilar()
   }
 
   const handleThemeChange = async (theme: string | null) => {
@@ -97,9 +91,6 @@ export default function Home() {
         isManualReview: true,
       })
     }
-
-    setReviewNotice('復習リストに追加しました。')
-    window.setTimeout(() => setReviewNotice(''), 2000)
   }
 
   const status = mapScoreToStatus(feedback?.score)
@@ -182,19 +173,8 @@ export default function Home() {
         theme={currentPrompt?.theme ?? activeThemeLabel}
         level={currentPrompt?.level ?? '...'}
         source={currentPrompt?.source ?? 'llm'}
-        onRetrySimilar={isGeneratingPrompt ? undefined : handleRetrySimilar}
+        onNext={isGeneratingPrompt ? undefined : handleNextPrompt}
       />
-      <div className="flex flex-wrap items-center justify-between gap-3">
-        <button
-          type="button"
-          onClick={handleAddToReview}
-          disabled={!currentPrompt || isGeneratingPrompt}
-          className="rounded-full border border-indigo-100 px-5 py-2 text-sm font-medium text-indigo-600 transition hover:bg-indigo-50 disabled:cursor-not-allowed disabled:border-slate-200 disabled:text-slate-400"
-        >
-          復習リストに追加する
-        </button>
-        {reviewNotice && <span className="text-xs text-emerald-600">{reviewNotice}</span>}
-      </div>
       <AnswerInput
         value={userAnswer}
         onChange={setUserAnswer}
@@ -215,6 +195,8 @@ export default function Home() {
         grammarPoint={feedback?.grammarPoint}
         encouragement={feedback?.encouragement}
         variations={feedback?.variations}
+        onAddToReview={handleAddToReview}
+        onNext={handleNextPrompt}
       />
     </div>
   )

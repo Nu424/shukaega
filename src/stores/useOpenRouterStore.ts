@@ -5,7 +5,6 @@ import {
   DEFAULT_GRANULARITY,
   DEFAULT_LEVEL,
   DEFAULT_MODEL,
-  STORAGE_KEYS,
   type DifficultyLevel,
   type Granularity,
 } from '../utils/constants'
@@ -36,36 +35,10 @@ const DEFAULT_STATE: Pick<OpenRouterStoreState, 'apiKey' | 'model' | 'level' | '
   granularity: DEFAULT_GRANULARITY as Granularity,
 }
 
-function readLegacyState() {
-  if (!isBrowser) {
-    return { ...DEFAULT_STATE }
-  }
-
-  const storedApiKey = window.localStorage.getItem(STORAGE_KEYS.apiKey)
-  const storedModel = window.localStorage.getItem(STORAGE_KEYS.model)
-  const storedLevel = window.localStorage.getItem(STORAGE_KEYS.level)
-  const storedGranularity = window.localStorage.getItem(STORAGE_KEYS.granularity)
-
-  return {
-    apiKey: storedApiKey ?? DEFAULT_STATE.apiKey,
-    model: storedModel ?? DEFAULT_STATE.model,
-    level: storedLevel ?? DEFAULT_STATE.level,
-    granularity: (storedGranularity as Granularity | null) ?? DEFAULT_STATE.granularity,
-  }
-}
-
-function clearLegacyKeys() {
-  if (!isBrowser) return
-  window.localStorage.removeItem(STORAGE_KEYS.apiKey)
-  window.localStorage.removeItem(STORAGE_KEYS.model)
-  window.localStorage.removeItem(STORAGE_KEYS.level)
-  window.localStorage.removeItem(STORAGE_KEYS.granularity)
-}
-
 export const useOpenRouterStore = create<OpenRouterStoreState>()(
   persist(
     (set) => ({
-      ...readLegacyState(),
+      ...DEFAULT_STATE,
       setApiKey(apiKey) {
         set({ apiKey })
       },
@@ -86,9 +59,6 @@ export const useOpenRouterStore = create<OpenRouterStoreState>()(
       name: 'shukaega-openrouter',
       version: 1,
       storage: createJSONStorage(() => (isBrowser ? window.localStorage : noopStorage)),
-      onRehydrateStorage: () => () => {
-        clearLegacyKeys()
-      },
     },
   ),
 )

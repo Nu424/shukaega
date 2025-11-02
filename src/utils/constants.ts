@@ -1,12 +1,5 @@
 export const OPENROUTER_API_URL = 'https://openrouter.ai/api/v1/chat/completions'
 
-export const STORAGE_KEYS = {
-  apiKey: 'openrouter_api_key',
-  model: 'openrouter_model',
-  level: 'shukaega_level',
-  granularity: 'shukaega_granularity',
-} as const
-
 export const DEFAULT_MODEL = 'openrouter/auto'
 export const DEFAULT_LEVEL = 'normal'
 export const DEFAULT_GRANULARITY = 'normal'

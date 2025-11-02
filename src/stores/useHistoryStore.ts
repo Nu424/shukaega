@@ -23,7 +23,6 @@ type HistoryStoreState = {
   removeFromReview: (id: string) => void
 }
 
-const LEGACY_STORAGE_KEY = 'shukaega_history_items'
 const isBrowser = typeof window !== 'undefined'
 const noopStorage: StateStorage = {
   getItem: () => null,
@@ -38,36 +37,10 @@ function createId() {
   return `hist-${Date.now()}-${Math.random().toString(16).slice(2)}`
 }
 
-function readLegacyItems(): HistoryItem[] {
-  if (!isBrowser) return []
-  const raw = window.localStorage.getItem(LEGACY_STORAGE_KEY)
-  if (!raw) return []
-  try {
-    const parsed = JSON.parse(raw)
-    if (Array.isArray(parsed)) {
-      return parsed
-        .map((item) => ({
-          ...item,
-          createdAt: item.createdAt ?? new Date().toISOString(),
-          isManualReview: item.isManualReview ?? false,
-        }))
-        .slice(0, MAX_HISTORY_ITEMS)
-    }
-  } catch (error) {
-    // ignore parsing errors
-  }
-  return []
-}
-
-function clearLegacyItems() {
-  if (!isBrowser) return
-  window.localStorage.removeItem(LEGACY_STORAGE_KEY)
-}
-
 export const useHistoryStore = create<HistoryStoreState>()(
   persist(
     (set, get) => ({
-      items: readLegacyItems(),
+      items: [],
       add(entry) {
         const item: HistoryItem = {
           id: createId(),
@@ -113,9 +86,6 @@ export const useHistoryStore = create<HistoryStoreState>()(
       name: 'shukaega-history',
       version: 1,
       storage: createJSONStorage(() => (isBrowser ? window.localStorage : noopStorage)),
-      onRehydrateStorage: () => () => {
-        clearLegacyItems()
-      },
     },
   ),
 )

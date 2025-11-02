@@ -56,20 +56,8 @@ export default function AppLayout() {
           >
             <span className="text-2xl">☰</span>
           </button>
-          <div>
-            <Link to="/" className="text-xl font-semibold text-indigo-600">
-              Shukaega
-            </Link>
-            <p className="text-sm text-slate-500">Theme: Travel Conversations</p>
-          </div>
-        </div>
-        <div className="flex items-center gap-4">
-          <Link
-            to="/settings"
-            className="inline-flex items-center gap-2 rounded-full border border-slate-200 px-4 py-2 text-sm font-medium text-slate-600 transition hover:border-indigo-200 hover:text-indigo-600"
-          >
-            <span aria-hidden>⚙️</span>
-            Settings
+          <Link to="/" className="text-xl font-semibold text-indigo-600">
+            Shukaega
           </Link>
         </div>
       </header>
